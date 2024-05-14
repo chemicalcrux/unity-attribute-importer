@@ -15,73 +15,149 @@ namespace ChemicalCrux.UVImporter
 
         void OnPostprocessModel(GameObject gameObject)
         {
-            Debug.Log(gameObject);
-
             string path = Path.ChangeExtension(assetPath, "uv");
+            var modelImporter = assetImporter as ModelImporter;
 
-            if (File.Exists(path))
+            if (!File.Exists(path))
+                return;
+
+            Dictionary<string, Mesh> meshLookup = new();
+            Dictionary<Mesh, List<int>> indexTableLookup = new();
+
+            Mesh singleMesh = null;
+
+            // if preserveHierarchy is off and there are no children, then we lose the name from Blender
+            bool useNames = modelImporter.preserveHierarchy || gameObject.transform.childCount > 0;
+
+            if (useNames)
             {
-                Debug.Log("A file exists!!!");
-
-                context.DependsOnSourceAsset(path);
-
-                using var stream = File.Open(path, FileMode.Open);
-                using var reader = new BinaryReader(stream);
-
-                int sourceLayer = reader.ReadInt32();
-                int sourceDim = reader.ReadInt32();
-                int targetLayer = reader.ReadInt32();
-                int dimensions = reader.ReadInt32();
-                int vertices = reader.ReadInt32();
-
-                Debug.Log($"Reading {vertices} verts with {dimensions} dims based on UV{sourceLayer}'s dim{sourceDim} into UV{targetLayer}");
-
-                List<Vector4> results = new(vertices);
-
-                for (int vertex = 0; vertex < vertices; ++vertex)
+                foreach (var meshFilter in gameObject.GetComponentsInChildren<MeshFilter>())
                 {
-                    Vector4 coordinate = default;
-
-                    for (int dimension = 0; dimension < dimensions; ++dimension)
+                    if (!meshLookup.TryAdd(meshFilter.name, meshFilter.sharedMesh))
                     {
-                        coordinate[dimension] = reader.ReadSingle();
+                        Debug.LogWarning(gameObject + " has a name collision: " + meshFilter.name);
                     }
-
-                    results.Add(coordinate);
                 }
 
-                MeshFilter filter = gameObject.GetComponentInChildren<MeshFilter>();
-
-                if (filter)
+                foreach (var skinnedMeshRenderer in gameObject.GetComponentsInChildren<SkinnedMeshRenderer>())
                 {
-                    Debug.Log("Got a filter");
-                    Debug.Log("Vertex count: " + filter.sharedMesh.vertexCount);
-
-                    List<Vector2> lookup = new();
-                    filter.sharedMesh.GetUVs(sourceLayer, lookup);
-
-                    List<Vector4> uvs = new();
-
-                    int verts = filter.sharedMesh.vertexCount;
-
-                    for (int i = 0; i < verts; ++i)
+                    if (!meshLookup.TryAdd(skinnedMeshRenderer.name, skinnedMeshRenderer.sharedMesh))
                     {
-                        float xCoord = lookup[i][sourceDim];
-                        int index = 0;
-
-                        // type-pun the float back into an int to retrieve the original vertex index.
-                        unsafe
-                        {
-                            float* ptr = &xCoord;
-                            index = *(int*)ptr;
-                        }
-
-                        uvs.Add(results[index]);
+                        Debug.LogWarning(gameObject + " has a name collision: " + skinnedMeshRenderer.name);
                     }
-
-                    filter.sharedMesh.SetUVs(targetLayer, uvs);
                 }
             }
+            else
+            {
+                if (gameObject.TryGetComponent(out MeshFilter meshFilter))
+                    singleMesh = meshFilter.sharedMesh;
+                else if (gameObject.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
+                    singleMesh = skinnedMeshRenderer.sharedMesh;
+                else
+                {
+                    Debug.LogWarning($"Expected to find a mesh on the root of {gameObject}. Aborting import.");
+                    return;
+                }
+            }
+
+            context.DependsOnSourceAsset(path);
+
+            using var stream = File.Open(path, FileMode.Open);
+            using var reader = new BinaryReader(stream);
+
+            int meshes = reader.ReadInt32();
+
+            for (int mesh = 0; mesh < meshes; ++mesh)
+            {
+                int nameLength = reader.ReadInt32();
+                byte[] nameBytes = reader.ReadBytes(nameLength);
+                reader.ReadBytes((4 - (nameLength % 4)) % 4);
+
+                string name = Encoding.UTF8.GetString(nameBytes);
+
+                Debug.Log("Name: " + name);
+
+                Mesh targetMesh;
+
+                if (!useNames)
+                {
+                    targetMesh = singleMesh;
+                }
+                else if (!meshLookup.TryGetValue(name, out targetMesh))
+                {
+                    Debug.LogWarning($"Expected to find an object named {name} on {gameObject.name}. Aborting import.");
+                    return;
+                }
+
+                ReadSingleMesh(reader, targetMesh);
+            }
+        }
+
+        void ReadSingleMesh(BinaryReader reader, Mesh mesh)
+        {
+            int sourceLayer = reader.ReadInt32();
+            int sourceDim = reader.ReadInt32();
+            int records = reader.ReadInt32();
+
+            Debug.Log("Vertex count: " + mesh.vertexCount);
+
+            List<Vector2> lookup = new();
+            mesh.GetUVs(sourceLayer, lookup);
+
+            int verts = mesh.vertexCount;
+
+            List<int> indexLookup = new();
+
+            for (int i = 0; i < verts; ++i)
+            {
+                float xCoord = lookup[i][sourceDim];
+                int index = 0;
+
+                // type-pun the float back into an int to retrieve the original vertex index.
+                unsafe
+                {
+                    float* ptr = &xCoord;
+                    index = *(int*)ptr;
+                }
+                
+                indexLookup.Add(index);
+            }
+
+            for (int record = 0; record < records; ++record)
+            {
+                ReadSingleRecord(reader, mesh, indexLookup);
+            }
+        }
+
+        void ReadSingleRecord(BinaryReader reader, Mesh mesh, List<int> indexLookup)
+        {
+            int targetLayer = reader.ReadInt32();
+            int dimensions = reader.ReadInt32();
+            int vertices = reader.ReadInt32();
+
+            Debug.Log($"Reading {vertices} verts with {dimensions} dims into UV{targetLayer}");
+
+            List<Vector4> results = new(vertices);
+            List<Vector4> uvs = new(vertices);
+
+            for (int vertex = 0; vertex < vertices; ++vertex)
+            {
+                Vector4 coordinate = default;
+
+                for (int dimension = 0; dimension < dimensions; ++dimension)
+                {
+                    coordinate[dimension] = reader.ReadSingle();
+                }
+
+                results.Add(coordinate);
+            }
+
+            for (int vertex = 0; vertex < mesh.vertexCount; ++vertex)
+            {
+                uvs.Add(results[indexLookup[vertex]]);
+            }
+
+            mesh.SetUVs(targetLayer, uvs);
         }
     }
 }
