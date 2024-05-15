@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace ChemicalCrux.UVImporter
 {
-    public class UVImporter : AssetPostprocessor
+    public class ModelPostprocessor : AssetPostprocessor
     {
         public override uint GetVersion()
         {
