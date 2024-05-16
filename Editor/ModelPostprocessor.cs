@@ -21,6 +21,14 @@ namespace ChemicalCrux.UVImporter
             if (!File.Exists(path))
                 return;
 
+            context.DependsOnArtifact(path);
+            context.DependsOnSourceAsset(path);
+
+            var exportedVertexData = AssetImporter.GetAtPath(path) as VertexDataImporter;
+
+            if (!exportedVertexData)
+                return;
+
             Dictionary<string, Mesh> meshLookup = new();
             Dictionary<Mesh, List<int>> indexTableLookup = new();
 
@@ -60,7 +68,6 @@ namespace ChemicalCrux.UVImporter
                 }
             }
 
-            context.DependsOnSourceAsset(path);
 
             using var stream = File.Open(path, FileMode.Open);
             using var reader = new BinaryReader(stream);
@@ -75,7 +82,8 @@ namespace ChemicalCrux.UVImporter
 
                 string name = Encoding.UTF8.GetString(nameBytes);
 
-                Debug.Log("Name: " + name);
+                if (Settings.instance.Debug)
+                    Debug.Log("Name: " + name);
 
                 Mesh targetMesh;
 
@@ -89,17 +97,18 @@ namespace ChemicalCrux.UVImporter
                     return;
                 }
 
-                ReadSingleMesh(reader, targetMesh);
+                ReadSingleMesh(exportedVertexData, reader, targetMesh);
             }
         }
 
-        void ReadSingleMesh(BinaryReader reader, Mesh mesh)
+        void ReadSingleMesh(VertexDataImporter exportedVertexData, BinaryReader reader, Mesh mesh)
         {
             int sourceLayer = reader.ReadInt32();
             int sourceDim = reader.ReadInt32();
             int records = reader.ReadInt32();
 
-            Debug.Log("Vertex count: " + mesh.vertexCount);
+            if (Settings.instance.Debug)
+                Debug.Log("Vertex count: " + mesh.vertexCount);
 
             List<Vector2> lookup = new();
             mesh.GetUVs(sourceLayer, lookup);
@@ -125,11 +134,11 @@ namespace ChemicalCrux.UVImporter
 
             for (int record = 0; record < records; ++record)
             {
-                ReadSingleRecord(reader, mesh, indexLookup);
+                ReadSingleRecord(exportedVertexData, reader, mesh, indexLookup);
             }
         }
 
-        void ReadSingleRecord(BinaryReader reader, Mesh mesh, List<int> indexLookup)
+        void ReadSingleRecord(VertexDataImporter exportedVertexData, BinaryReader reader, Mesh mesh, List<int> indexLookup)
         {
             int targetLayer = reader.ReadInt32();
             int dimensions = reader.ReadInt32();
@@ -154,6 +163,14 @@ namespace ChemicalCrux.UVImporter
 
             for (int vertex = 0; vertex < mesh.vertexCount; ++vertex)
             {
+                int index = indexLookup[vertex];
+
+                if (index < 0 || index >= results.Count)
+                {
+                    Debug.LogError($"Bogus index of {index} for {mesh.name}. Did the UV map get overwritten?");
+                    return;
+                }
+
                 uvs.Add(results[indexLookup[vertex]]);
             }
 
