@@ -2,15 +2,10 @@ using UnityEngine;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace ChemicalCrux.UVImporter
 {
-    public struct VertexSource
-    {
-        public int sourceChannel;
-        public int sourceComponent;
-    }
-
     public class DataParser
     {
         private BinaryReader reader;
@@ -19,18 +14,19 @@ namespace ChemicalCrux.UVImporter
         public int NumObjects { get; private set; }
 
         // object
-        public int NameLength { get; private set; }
-        public string Name { get; private set; }
-        public VertexSource VertexSource { get; private set; }
+        public string ObjectName { get; private set; }
+        public UVTarget VertexSource { get; private set; }
         public int NumRecords { get; private set; }
 
         // record
+        public string AttributeName { get; private set; }
         public int VertexCount { get; private set; }
         public int Dimensions { get; private set; }
-        
+        public int FloatCount { get; private set; }
+
         public DataParser(BinaryReader binaryReader)
         {
-            this.reader = binaryReader;
+            reader = binaryReader;
         }
 
         public void ReadHeader()
@@ -40,15 +36,11 @@ namespace ChemicalCrux.UVImporter
 
         public void ReadObjectHeader()
         {
-            NameLength = reader.ReadInt32();
+            ObjectName = ReadString();
 
-            byte[] nameBytes = reader.ReadBytes(NameLength);
-            reader.ReadBytes((4 - (NameLength % 4)) % 4);
-            Name = Encoding.UTF8.GetString(nameBytes);
-
-            VertexSource source = default;
-            source.sourceChannel = reader.ReadInt32();
-            source.sourceComponent = reader.ReadInt32();
+            UVTarget source = default;
+            source.channel = (UVChannel)reader.ReadInt32();
+            source.component = (UVComponent)reader.ReadInt32();
             VertexSource = source;
 
             NumRecords = reader.ReadInt32();
@@ -56,8 +48,10 @@ namespace ChemicalCrux.UVImporter
 
         public void ReadRecordHeader()
         {
+            AttributeName = ReadString();
             VertexCount = reader.ReadInt32();
             Dimensions = reader.ReadInt32();
+            FloatCount = VertexCount * Dimensions;
         }
 
         public void ReadRecordData(List<Vector4> output)
@@ -78,6 +72,39 @@ namespace ChemicalCrux.UVImporter
         public void SkipRecordData()
         {
             reader.BaseStream.Seek(sizeof(float) * VertexCount * Dimensions, SeekOrigin.Current);
+        }
+
+        /// <summary>
+        /// Reads all of the record headers for the current object, then rewinds
+        /// back to where it started.
+        /// </summary>
+        /// <returns>A list of attribute names</returns>
+        public List<string> PeekRecordHeaders()
+        {
+            List<string> results = new();
+
+            long position = reader.BaseStream.Position;
+
+            Debug.Log(reader.BaseStream.Position);
+            for (int i = 0; i < NumRecords; ++i)
+            {
+                ReadRecordHeader();
+                results.Add(AttributeName);
+                SkipRecordData();
+            }
+
+            reader.BaseStream.Seek(position, SeekOrigin.Begin);
+            Debug.Log(reader.BaseStream.Position);
+
+            return results;
+        }
+
+        private string ReadString()
+        {
+            int length = reader.ReadInt32();
+            byte[] nameBytes = reader.ReadBytes(length);
+            reader.ReadBytes((4 - (length % 4)) % 4);
+            return Encoding.UTF8.GetString(nameBytes);
         }
     }
 }
