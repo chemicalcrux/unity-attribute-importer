@@ -1,6 +1,6 @@
 {
-    "name": "UVImporter",
-    "rootNamespace": "ChemicalCrux.UVImporter",
+    "name": "AttributeImporter",
+    "rootNamespace": "ChemicalCrux.AttributeImporter",
     "references": [],
     "includePlatforms": [
         "Editor"

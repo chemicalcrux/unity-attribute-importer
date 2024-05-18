@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace ChemicalCrux.UVImporter
+namespace ChemicalCrux.AttributeImporter
 {
     [System.Serializable]
     public struct UVTarget

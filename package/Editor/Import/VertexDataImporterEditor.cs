@@ -2,7 +2,7 @@ using UnityEditor;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 
-namespace ChemicalCrux.UVImporter
+namespace ChemicalCrux.AttributeImporter
 {
     [CustomEditor(typeof(VertexDataImporter))]
     public class VertexDataImporterEditor : ScriptedImporterEditor

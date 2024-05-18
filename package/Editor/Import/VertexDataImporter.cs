@@ -4,24 +4,8 @@ using UnityEditor.AssetImporters;
 using UnityEngine;
 using System.Linq;
 
-namespace ChemicalCrux.UVImporter
+namespace ChemicalCrux.AttributeImporter
 {
-    [System.Serializable]
-    public class AttributeTarget
-    {
-        public enum Kind
-        {
-            None,
-            UV,
-            VertexColor
-        }
-
-        public Kind kind;
-
-        public UVTarget uvTarget;
-        public VertexColorTarget vertexColorTarget;
-    }
-
     [ScriptedImporter(9, "uv")]
     public class VertexDataImporter : ScriptedImporter
     {

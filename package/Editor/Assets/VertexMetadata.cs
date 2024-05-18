@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace ChemicalCrux.UVImporter
+namespace ChemicalCrux.AttributeImporter
 {
     public class VertexMetadata : ScriptableObject
     {

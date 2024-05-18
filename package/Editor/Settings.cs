@@ -4,7 +4,7 @@ using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace ChemicalCrux.UVImporter
+namespace ChemicalCrux.AttributeImporter
 {
     [FilePath("chemicalcrux/Vertex Data Importer/Settings.settings", FilePathAttribute.Location.ProjectFolder)]
     public class Settings : ScriptableSingleton<Settings>

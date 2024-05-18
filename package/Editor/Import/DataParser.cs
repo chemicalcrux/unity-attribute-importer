@@ -4,7 +4,7 @@ using System.Text;
 using System.Collections.Generic;
 using UnityEditor;
 
-namespace ChemicalCrux.UVImporter
+namespace ChemicalCrux.AttributeImporter
 {
     public class DataParser
     {
@@ -29,11 +29,19 @@ namespace ChemicalCrux.UVImporter
             reader = binaryReader;
         }
 
+        /// <summary>
+        /// This should be called exactly once to read the header.
+        /// </summary>
         public void ReadHeader()
         {
             NumObjects = reader.ReadInt32();
         }
 
+        /// <summary>
+        /// Call this method to start reading an object's data. <see cref="ReadRecordHeader"/>
+        /// and either <see cref="ReadRecordData"/> or <see cref="SkipRecordData"/> must be called
+        /// the correct number of times before another object header is read.
+        /// </summary>
         public void ReadObjectHeader()
         {
             ObjectName = ReadString();
@@ -46,6 +54,11 @@ namespace ChemicalCrux.UVImporter
             NumRecords = reader.ReadInt32();
         }
 
+        /// <summary>
+        /// Reads a single record's header. This must be called as many times as there are records.
+        /// <see cref="ReadRecordData"/> or <see cref="SkipRecordData"/> must be called before another
+        /// record's header is read.
+        /// </summary>
         public void ReadRecordHeader()
         {
             AttributeName = ReadString();
@@ -54,6 +67,11 @@ namespace ChemicalCrux.UVImporter
             FloatCount = VertexCount * Dimensions;
         }
 
+        /// <summary>
+        /// Reads a single record's data into a list. Must be called exactly once after <see cref="ReadRecordHeader"/>.
+        /// See <see cref="SkipRecordData"/> if the data is not needed.
+        /// </summary>
+        /// <param name="output">A list to be filled with data. The list will not be cleared.</param>
         public void ReadRecordData(List<Vector4> output)
         {
             for (int vertex = 0; vertex < VertexCount; ++vertex)
@@ -69,6 +87,10 @@ namespace ChemicalCrux.UVImporter
             }
         }
 
+        /// <summary>
+        /// Skips the data for a single record. Must be called exactly once after <see cref="ReadRecordHeader"/>.
+        /// See <see cref="ReadRecordData"/> if the data is needed.
+        /// </summary>
         public void SkipRecordData()
         {
             reader.BaseStream.Seek(sizeof(float) * VertexCount * Dimensions, SeekOrigin.Current);
@@ -76,7 +98,9 @@ namespace ChemicalCrux.UVImporter
 
         /// <summary>
         /// Reads all of the record headers for the current object, then rewinds
-        /// back to where it started.
+        /// back to where it started. May only be called immediately after <see cref="ReadObjectHeader"/>.
+        /// 
+        /// Used to learn the names of the attributes in a record.
         /// </summary>
         /// <returns>A list of attribute names</returns>
         public List<string> PeekRecordHeaders()
@@ -99,6 +123,11 @@ namespace ChemicalCrux.UVImporter
             return results;
         }
 
+        /// <summary>
+        /// Reads a length, then reads that many bytes to decode to a string, then skips bytes to
+        /// get back to a 4-byte alignment.
+        /// </summary>
+        /// <returns>The parsed string</returns>
         private string ReadString()
         {
             int length = reader.ReadInt32();

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ChemicalCrux.UVImporter
+namespace ChemicalCrux.AttributeImporter
 {
     public enum UVChannel
     {
