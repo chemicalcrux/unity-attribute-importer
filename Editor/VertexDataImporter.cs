@@ -22,7 +22,7 @@ namespace ChemicalCrux.UVImporter
         public VertexColorTarget vertexColorTarget;
     }
 
-    [ScriptedImporter(7, "uv")]
+    [ScriptedImporter(9, "uv")]
     public class VertexDataImporter : ScriptedImporter
     {
         [System.Serializable]
@@ -40,15 +40,26 @@ namespace ChemicalCrux.UVImporter
             public List<AttributeTarget> targets;
         }
 
+        /// <summary>
+        /// Information about an attribute that currently exists in the attribute file.
+        /// </summary>
+        [System.Serializable]
+        internal struct AttributeInfo
+        {
+            public string name;
+            public int dimensions;
+        }
+
         [SerializeField, HideInInspector] internal List<string> objectNames;
-        [SerializeField, HideInInspector] internal List<string> attributeNames;
+        [SerializeField, HideInInspector] internal List<AttributeInfo> activeAttributeInfo;
 
         [SerializeField] internal List<AttributeConfig> attributeConfigs;
 
         public override void OnImportAsset(AssetImportContext ctx)
         {
             objectNames.Clear();
-            HashSet<string> attributeNameSet = new();
+
+            HashSet<AttributeInfo> attributeInfoSet = new();
 
             using var stream = File.Open(ctx.assetPath, FileMode.Open);
             using var reader = new BinaryReader(stream);
@@ -66,14 +77,18 @@ namespace ChemicalCrux.UVImporter
                 {
                     parser.ReadRecordHeader();
 
-                    attributeNameSet.Add(parser.AttributeName);
+                    attributeInfoSet.Add(new AttributeInfo()
+                    {
+                        dimensions = parser.Dimensions,
+                        name = parser.AttributeName
+                    });
 
                     parser.SkipRecordData();
                 }
             }
 
-            attributeNames.Clear();
-            attributeNames.AddRange(attributeNameSet);
+            activeAttributeInfo.Clear();
+            activeAttributeInfo.AddRange(attributeInfoSet);
 
             UpdateConfigs();
 
@@ -86,25 +101,29 @@ namespace ChemicalCrux.UVImporter
 
         void UpdateConfigs()
         {
-            foreach (var attributeName in attributeNames)
+            foreach (var info in activeAttributeInfo)
             {
-                AttributeConfig config = attributeConfigs.FirstOrDefault(config => config.name == attributeName);
+                AttributeConfig config = attributeConfigs.FirstOrDefault(config => config.name == info.name);
 
                 if (config == null)
                 {
                     config = new()
                     {
-                        name = attributeName,
+                        name = info.name,
                         targets = new()
                     };
 
                     attributeConfigs.Add(config);
                 }
 
-                // TODO variable number of dimensinos
-                if (config.targets.Count != 4)
+                if (config.targets.Count != info.dimensions)
                 {
-                    for (int i = 0; i < 4; ++i)
+                    while (config.targets.Count > info.dimensions)
+                    {
+                        config.targets.RemoveAt(config.targets.Count - 1);
+                    }
+
+                    for (int i = config.targets.Count; i < info.dimensions; ++i)
                     {
                         AttributeTarget target = new()
                         {
@@ -123,7 +142,7 @@ namespace ChemicalCrux.UVImporter
 
             foreach (var config in attributeConfigs)
             {
-                config.exists = attributeNames.Contains(config.name);
+                config.exists = activeAttributeInfo.Any(info => info.name == config.name);
             }
         }
     }

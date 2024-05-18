@@ -10,7 +10,7 @@ namespace ChemicalCrux.UVImporter
     {
         public override uint GetVersion()
         {
-            return 14;
+            return 15;
         }
 
         void OnPostprocessModel(GameObject gameObject)
@@ -301,7 +301,7 @@ namespace ChemicalCrux.UVImporter
 
                 Vector4 vec = results[index];
 
-                for (int targetIndex = 0; targetIndex < 4; ++targetIndex)
+                for (int targetIndex = 0; targetIndex < targets.Count ; ++targetIndex)
                     intermediateVertexData.Write(targets[targetIndex], vertex, vec[targetIndex]);
             }
         }

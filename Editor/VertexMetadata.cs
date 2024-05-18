@@ -17,11 +17,11 @@ namespace ChemicalCrux.UVImporter
         {
             attributeConfigs = new();
 
-            foreach (var attributeName in importer.attributeNames)
+            foreach (var info in importer.activeAttributeInfo)
             {
-                var config = importer.attributeConfigs.Find(config => config.name == attributeName);
+                var config = importer.attributeConfigs.Find(config => config.name == info.name);
 
-                Debug.Log(attributeName + ": " + config);
+                Debug.Log(info.name + ": " + config);
                 if (config != null)
                     attributeConfigs.Add(config);
             }
