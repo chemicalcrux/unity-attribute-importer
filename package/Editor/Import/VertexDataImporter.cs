@@ -34,10 +34,10 @@ namespace ChemicalCrux.AttributeImporter
             public int dimensions;
         }
 
-        [SerializeField, HideInInspector] internal List<string> objectNames;
-        [SerializeField, HideInInspector] internal List<AttributeInfo> activeAttributeInfo;
+        [SerializeField, HideInInspector] internal List<string> objectNames = new();
+        [SerializeField, HideInInspector] internal List<AttributeInfo> activeAttributeInfo = new();
 
-        [SerializeField] internal List<AttributeConfig> attributeConfigs;
+        [SerializeField] internal List<AttributeConfig> attributeConfigs = new();
 
         public override void OnImportAsset(AssetImportContext ctx)
         {

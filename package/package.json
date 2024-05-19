@@ -7,5 +7,12 @@
         "name": "Fen",
         "email": "chemicalcrux@gmail.com"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "samples": [
+        {
+            "displayName": "Simple Example",
+            "description": "An example of several attributes being imported for one object",
+            "path": "Samples~/SimpleExample"
+        }
+    ]
 }
