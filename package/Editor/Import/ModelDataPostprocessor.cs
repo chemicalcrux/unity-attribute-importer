@@ -42,7 +42,8 @@ namespace ChemicalCrux.AttributeImporter
                 {
                     if (!meshLookup.TryAdd(meshFilter.name, meshFilter.sharedMesh))
                     {
-                        Debug.LogWarning(gameObject + " has a name collision: " + meshFilter.name);
+                        if (Settings.instance.LogWarning)
+                            Debug.LogWarning(gameObject + " has a name collision: " + meshFilter.name);
                     }
                 }
 
@@ -50,7 +51,8 @@ namespace ChemicalCrux.AttributeImporter
                 {
                     if (!meshLookup.TryAdd(skinnedMeshRenderer.name, skinnedMeshRenderer.sharedMesh))
                     {
-                        Debug.LogWarning(gameObject + " has a name collision: " + skinnedMeshRenderer.name);
+                        if (Settings.instance.LogWarning)
+                            Debug.LogWarning(gameObject + " has a name collision: " + skinnedMeshRenderer.name);
                     }
                 }
             }
@@ -62,7 +64,8 @@ namespace ChemicalCrux.AttributeImporter
                     singleMesh = skinnedMeshRenderer.sharedMesh;
                 else
                 {
-                    Debug.LogWarning($"Expected to find a mesh on the root of {gameObject}. Aborting import.");
+                    if (Settings.instance.LogWarning)
+                        Debug.LogWarning($"Expected to find a mesh on the root of {gameObject}. Aborting import.");
                     return;
                 }
             }
@@ -81,7 +84,7 @@ namespace ChemicalCrux.AttributeImporter
             {
                 parser.ReadObjectHeader();
 
-                if (Settings.instance.Debug)
+                if (Settings.instance.LogDebug)
                     Debug.Log("Name: " + parser.ObjectName);
 
                 Mesh targetMesh;
@@ -92,7 +95,8 @@ namespace ChemicalCrux.AttributeImporter
                 }
                 else if (!meshLookup.TryGetValue(parser.ObjectName, out targetMesh))
                 {
-                    Debug.LogWarning($"Expected to find an object named {parser.ObjectName} on {gameObject.name}. Aborting import.");
+                    if (Settings.instance.LogError)
+                        Debug.LogError($"Expected to find an object named {parser.ObjectName} on {gameObject.name}. Aborting import.");
                     return;
                 }
 
@@ -102,7 +106,7 @@ namespace ChemicalCrux.AttributeImporter
 
         void ReadSingleMesh(AttributeMetadata vertexMetadata, DataParser parser, Mesh mesh)
         {
-            if (Settings.instance.Debug)
+            if (Settings.instance.LogDebug)
                 Debug.Log($"Vertex count on {mesh.name}: {mesh.vertexCount}");
 
             List<Vector2> lookup = new();
@@ -141,18 +145,21 @@ namespace ChemicalCrux.AttributeImporter
         {
             parser.ReadRecordHeader();
 
-            if (Settings.instance.Debug)
+            if (Settings.instance.LogDebug)
                 Debug.Log($"Reading {parser.AttributeName} into {mesh.name}");
 
             var config = configs.Find(config => config.name == parser.AttributeName);
             var targets = config.targets;
 
-            foreach (var target in targets)
+            if (Settings.instance.LogDebug)
             {
-                Debug.Log(target.uvTarget);
+                string logLine = "Targets: ";
+                logLine += string.Join(", ", targets);
+                Debug.Log(logLine);
             }
 
-            Debug.Log($"Reading {parser.VertexCount} verts with {parser.Dimensions} dims into UV whatever");
+            if (Settings.instance.LogDebug)
+                Debug.Log($"Reading {parser.VertexCount} verts with {parser.Dimensions} dimensions");
 
             List<Vector4> results = new(parser.VertexCount);
 
@@ -166,13 +173,14 @@ namespace ChemicalCrux.AttributeImporter
 
                 if (index < 0 || index >= results.Count)
                 {
-                    Debug.LogError($"Bogus index of {index} for {mesh.name}; only {results.Count}/{parser.VertexCount} vertices should be there Did the UV map get overwritten?");
+                    if (Settings.instance.LogError)
+                        Debug.LogError($"Bogus index of {index} for {mesh.name}; only {results.Count}/{parser.VertexCount} vertices should be there Did the UV map get overwritten?");
                     return;
                 }
 
                 Vector4 vec = results[index];
 
-                for (int targetIndex = 0; targetIndex < targets.Count ; ++targetIndex)
+                for (int targetIndex = 0; targetIndex < targets.Count; ++targetIndex)
                     intermediateVertexData.Write(targets[targetIndex], vertex, vec[targetIndex]);
             }
         }

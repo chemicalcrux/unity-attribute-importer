@@ -22,6 +22,14 @@ namespace ChemicalCrux.AttributeImporter
             VertexColorComponent.A => Color.white,
             _ => Color.white
         };
+
+        public override string ToString() => "Vertex " + component switch {
+            VertexColorComponent.R => "Red",
+            VertexColorComponent.G => "Green",
+            VertexColorComponent.B => "Blue",
+            VertexColorComponent.A => "Alpha",
+            _ => "Invalid Color"
+        };
     }
 
     [CustomPropertyDrawer(typeof(VertexColorTarget))]

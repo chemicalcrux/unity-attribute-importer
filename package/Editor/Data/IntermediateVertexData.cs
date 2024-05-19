@@ -24,7 +24,7 @@ namespace ChemicalCrux.AttributeImporter
             {
                 if (usedAttributes.All(attribute => attribute != config.name))
                 {
-                    if (Settings.instance.debug)
+                    if (Settings.instance.LogDebug)
                         Debug.Log($"Skipping {config.name} because it's unused");
                     continue;
                 }
@@ -48,11 +48,10 @@ namespace ChemicalCrux.AttributeImporter
                                 List<Vector4> output = new();
                                 mesh.GetUVs(target.uvTarget.ChannelIndex, output);
 
-                                Debug.Log(output.Count);
-
                                 if (output.Count != mesh.vertexCount)
                                 {
-                                    Debug.Log($"Expected {mesh.vertexCount} items; ignoring original UVs");
+                                    if (Settings.instance.LogDebug)
+                                        Debug.Log($"Expected {mesh.vertexCount} items; ignoring original UVs");
                                     output.Clear();
                                     for (int i = 0; i < mesh.vertexCount; ++i)
                                     {
@@ -74,11 +73,10 @@ namespace ChemicalCrux.AttributeImporter
                                 colorData = new();
                                 colorData.AddRange(mesh.colors.Select(color => (Vector4)color));
 
-                                Debug.Log(colorData.Count);
-
                                 if (colorData.Count != mesh.vertexCount)
                                 {
-                                    Debug.Log($"Expected {mesh.vertexCount} items; ignoring original colors");
+                                    if (Settings.instance.LogDebug)
+                                        Debug.Log($"Expected {mesh.vertexCount} items; ignoring original colors");
                                     colorData.Clear();
                                     for (int i = 0; i < mesh.vertexCount; ++i)
                                     {
@@ -121,14 +119,16 @@ namespace ChemicalCrux.AttributeImporter
         {
             foreach (var channel in usedUVChannels)
             {
-                Debug.Log($"Flushing {channel}");
+                if (Settings.instance.LogDebug)
+                    Debug.Log($"Flushing {channel}");
 
                 mesh.SetUVs((int)channel, uvData[channel]);
             }
 
             if (usedVertexColors)
             {
-                Debug.Log($"Flushing colors");
+                if (Settings.instance.LogDebug)
+                    Debug.Log($"Flushing colors");
 
                 mesh.SetColors(colorData.Select(vec => (Color)vec).ToArray());
             }

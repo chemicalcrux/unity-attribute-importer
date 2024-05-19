@@ -9,8 +9,18 @@ namespace ChemicalCrux.AttributeImporter
     [FilePath("chemicalcrux/Vertex Data Importer/Settings.settings", FilePathAttribute.Location.ProjectFolder)]
     public class Settings : ScriptableSingleton<Settings>
     {
-        [SerializeField] internal bool debug;
-        public bool Debug => debug;
+        public enum LogLevel
+        {
+            Error,
+            Warning,
+            Debug
+        }
+
+        [SerializeField] internal LogLevel logLevel = LogLevel.Warning;
+
+        public bool LogError => (int) logLevel >= (int) LogLevel.Error;
+        public bool LogWarning => (int) logLevel >= (int) LogLevel.Warning;
+        public bool LogDebug => (int) logLevel >= (int) LogLevel.Debug;
     }
 
     class ImporterSettingsProvider : SettingsProvider
@@ -52,7 +62,7 @@ namespace ChemicalCrux.AttributeImporter
                     properties.AddToClassList("property-list");
                     rootElement.Add(properties);
 
-                    properties.Add(new PropertyField(settingsObject.FindProperty(nameof(Settings.debug))));
+                    properties.Add(new PropertyField(settingsObject.FindProperty(nameof(Settings.logLevel))));
 
                     rootElement.Bind(settingsObject);
                 },

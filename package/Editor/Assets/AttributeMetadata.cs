@@ -21,7 +21,9 @@ namespace ChemicalCrux.AttributeImporter
             {
                 var config = importer.attributeConfigs.Find(config => config.name == info.name);
 
-                Debug.Log(info.name + ": " + config);
+                if (Settings.instance.LogDebug)
+                    Debug.Log(info.name + ": " + config);
+
                 if (config != null)
                     attributeConfigs.Add(config);
             }

@@ -41,7 +41,8 @@ namespace ChemicalCrux.AttributeImporter
 
             if (version != expectedVersion)
             {
-                Debug.LogWarning($"Expected version {expectedVersion}, but the attribute file's version is {version}");
+                if (Settings.instance.LogError)
+                    Debug.LogError($"Expected version {expectedVersion}, but the attribute file's version is {version}");
                 return false;
             }
 
@@ -122,7 +123,6 @@ namespace ChemicalCrux.AttributeImporter
 
             long position = reader.BaseStream.Position;
 
-            Debug.Log(reader.BaseStream.Position);
             for (int i = 0; i < NumRecords; ++i)
             {
                 ReadRecordHeader();
@@ -131,7 +131,6 @@ namespace ChemicalCrux.AttributeImporter
             }
 
             reader.BaseStream.Seek(position, SeekOrigin.Begin);
-            Debug.Log(reader.BaseStream.Position);
 
             return results;
         }
