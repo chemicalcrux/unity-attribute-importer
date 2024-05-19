@@ -9,7 +9,7 @@ namespace ChemicalCrux.AttributeImporter
     {
         public override uint GetVersion()
         {
-            return 15;
+            return 16;
         }
 
         void OnPostprocessModel(GameObject gameObject)
@@ -72,7 +72,10 @@ namespace ChemicalCrux.AttributeImporter
             using var reader = new BinaryReader(stream);
             DataParser parser = new(reader);
 
-            parser.ReadHeader();
+            if (!parser.ReadHeader())
+            {
+                return;
+            }
 
             for (int mesh = 0; mesh < parser.NumObjects; ++mesh)
             {

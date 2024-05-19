@@ -8,6 +8,8 @@ namespace ChemicalCrux.AttributeImporter
 {
     public class DataParser
     {
+        private const int expectedVersion = 1;
+
         private BinaryReader reader;
 
         // header
@@ -32,9 +34,20 @@ namespace ChemicalCrux.AttributeImporter
         /// <summary>
         /// This should be called exactly once to read the header.
         /// </summary>
-        public void ReadHeader()
+        /// <returns>Whether or not the file was valid</returns>
+        public bool ReadHeader()
         {
+            int version = reader.ReadInt32();
+
+            if (version != expectedVersion)
+            {
+                Debug.LogWarning($"Expected version {expectedVersion}, but the attribute file's version is {version}");
+                return false;
+            }
+
             NumObjects = reader.ReadInt32();
+
+            return true;
         }
 
         /// <summary>
