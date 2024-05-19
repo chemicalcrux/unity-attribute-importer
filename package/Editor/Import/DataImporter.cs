@@ -7,7 +7,7 @@ using System.Linq;
 namespace ChemicalCrux.AttributeImporter
 {
     [ScriptedImporter(9, "uv")]
-    public class VertexDataImporter : ScriptedImporter
+    public class DataImporter : ScriptedImporter
     {
         [System.Serializable]
         public class ObjectConfig

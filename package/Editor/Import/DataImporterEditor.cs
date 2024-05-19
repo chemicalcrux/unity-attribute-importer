@@ -4,21 +4,21 @@ using UnityEngine;
 
 namespace ChemicalCrux.AttributeImporter
 {
-    [CustomEditor(typeof(VertexDataImporter))]
-    public class VertexDataImporterEditor : ScriptedImporterEditor
+    [CustomEditor(typeof(DataImporter))]
+    public class DataImporterEditor : ScriptedImporterEditor
     {
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
 
-            var array = serializedObject.FindProperty(nameof(VertexDataImporter.attributeConfigs));
+            var array = serializedObject.FindProperty(nameof(DataImporter.attributeConfigs));
 
             for (int attributeIndex = 0; attributeIndex < array.arraySize; ++attributeIndex)
             {
                 var attribute = array.GetArrayElementAtIndex(attributeIndex);
 
-                var attributeNameProp = attribute.FindPropertyRelative(nameof(VertexDataImporter.AttributeConfig.name));
-                var existsProp = attribute.FindPropertyRelative(nameof(VertexDataImporter.AttributeConfig.exists));
+                var attributeNameProp = attribute.FindPropertyRelative(nameof(DataImporter.AttributeConfig.name));
+                var existsProp = attribute.FindPropertyRelative(nameof(DataImporter.AttributeConfig.exists));
 
                 if (!existsProp.boolValue)
                     continue;

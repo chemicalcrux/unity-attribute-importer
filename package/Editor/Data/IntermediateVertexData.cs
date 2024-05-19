@@ -14,7 +14,7 @@ namespace ChemicalCrux.AttributeImporter
         private List<UVChannel> usedUVChannels = new();
         private bool usedVertexColors;
 
-        public IntermediateVertexData(List<VertexDataImporter.AttributeConfig> attributeConfigs, List<string> usedAttributes, int vertexCount, Mesh mesh)
+        public IntermediateVertexData(List<DataImporter.AttributeConfig> attributeConfigs, List<string> usedAttributes, int vertexCount, Mesh mesh)
         {
             this.vertexCount = vertexCount;
             this.mesh = mesh;

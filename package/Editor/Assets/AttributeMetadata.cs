@@ -11,9 +11,9 @@ namespace ChemicalCrux.AttributeImporter
             public AttributeTarget target;
         }
 
-        public List<VertexDataImporter.AttributeConfig> attributeConfigs;
+        public List<DataImporter.AttributeConfig> attributeConfigs;
 
-        public void Setup(VertexDataImporter importer)
+        public void Setup(DataImporter importer)
         {
             attributeConfigs = new();
 

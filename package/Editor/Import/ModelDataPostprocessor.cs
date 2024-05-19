@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace ChemicalCrux.AttributeImporter
 {
-    public class ModelPostprocessor : AssetPostprocessor
+    public class ModelDataPostprocessor : AssetPostprocessor
     {
         public override uint GetVersion()
         {
@@ -137,7 +137,7 @@ namespace ChemicalCrux.AttributeImporter
             intermediateVertexData.Flush();
         }
 
-        void ReadSingleRecord(List<VertexDataImporter.AttributeConfig> configs, IntermediateVertexData intermediateVertexData, DataParser parser, Mesh mesh, List<int> indexLookup)
+        void ReadSingleRecord(List<DataImporter.AttributeConfig> configs, IntermediateVertexData intermediateVertexData, DataParser parser, Mesh mesh, List<int> indexLookup)
         {
             parser.ReadRecordHeader();
 
