@@ -23,7 +23,7 @@ namespace ChemicalCrux.AttributeImporter
             context.DependsOnArtifact(path);
             context.DependsOnSourceAsset(path);
 
-            var vertexMetadata = AssetDatabase.LoadAssetAtPath<VertexMetadata>(path);
+            var vertexMetadata = AssetDatabase.LoadAssetAtPath<AttributeMetadata>(path);
 
             if (!vertexMetadata)
                 return;
@@ -100,7 +100,7 @@ namespace ChemicalCrux.AttributeImporter
             }
         }
 
-        void ReadSingleMesh(VertexMetadata vertexMetadata, DataParser parser, Mesh mesh)
+        void ReadSingleMesh(AttributeMetadata vertexMetadata, DataParser parser, Mesh mesh)
         {
             if (Settings.instance.Debug)
                 Debug.Log($"Vertex count on {mesh.name}: {mesh.vertexCount}");

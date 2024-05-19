@@ -76,7 +76,7 @@ namespace ChemicalCrux.AttributeImporter
 
             UpdateConfigs();
 
-            VertexMetadata metadata = ScriptableObject.CreateInstance<VertexMetadata>();
+            AttributeMetadata metadata = ScriptableObject.CreateInstance<AttributeMetadata>();
             metadata.Setup(this);
 
             ctx.AddObjectToAsset("Vertex Metadata", metadata);

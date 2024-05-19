@@ -95,10 +95,7 @@ namespace ChemicalCrux.AttributeImporter
                 EditorGUILayout.EndVertical();
             }
 
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(VertexDataImporter.attributeConfigs)));
-
             serializedObject.ApplyModifiedProperties();
-
             ApplyRevertGUI();
         }
 

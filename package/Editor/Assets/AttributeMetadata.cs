@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ChemicalCrux.AttributeImporter
 {
-    public class VertexMetadata : ScriptableObject
+    public class AttributeMetadata : ScriptableObject
     {
         public class Data
         {
