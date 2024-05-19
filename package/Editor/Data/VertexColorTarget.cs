@@ -23,7 +23,8 @@ namespace ChemicalCrux.AttributeImporter
             _ => Color.white
         };
 
-        public override string ToString() => "Vertex " + component switch {
+        public override string ToString() => "Vertex " + component switch
+        {
             VertexColorComponent.R => "Red",
             VertexColorComponent.G => "Green",
             VertexColorComponent.B => "Blue",

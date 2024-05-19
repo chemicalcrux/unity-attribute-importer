@@ -18,9 +18,9 @@ namespace ChemicalCrux.AttributeImporter
 
         [SerializeField] internal LogLevel logLevel = LogLevel.Warning;
 
-        public bool LogError => (int) logLevel >= (int) LogLevel.Error;
-        public bool LogWarning => (int) logLevel >= (int) LogLevel.Warning;
-        public bool LogDebug => (int) logLevel >= (int) LogLevel.Debug;
+        public bool LogError => (int)logLevel >= (int)LogLevel.Error;
+        public bool LogWarning => (int)logLevel >= (int)LogLevel.Warning;
+        public bool LogDebug => (int)logLevel >= (int)LogLevel.Debug;
     }
 
     class ImporterSettingsProvider : SettingsProvider
