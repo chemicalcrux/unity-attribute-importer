@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace ChemicalCrux.AttributeImporter
 {
-    [ScriptedImporter(9, "uv")]
+    [ScriptedImporter(10, "attrdata")]
     public class DataImporter : ScriptedImporter
     {
         [System.Serializable]

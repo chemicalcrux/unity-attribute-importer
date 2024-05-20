@@ -14,7 +14,7 @@ namespace ChemicalCrux.AttributeImporter
 
         void OnPostprocessModel(GameObject gameObject)
         {
-            string path = Path.ChangeExtension(assetPath, "uv");
+            string path = Path.ChangeExtension(assetPath, "attrdata");
             var modelImporter = assetImporter as ModelImporter;
 
             if (!File.Exists(path))
