@@ -7,6 +7,38 @@ namespace ChemicalCrux.AttributeImporter
     [CustomEditor(typeof(DataImporter))]
     public class DataImporterEditor : ScriptedImporterEditor
     {
+        void SetColors(SerializedProperty targetArray)
+        {
+            for (int targetIndex = 0; targetIndex < targetArray.arraySize; ++targetIndex)
+            {
+                var targetProp = targetArray.GetArrayElementAtIndex(targetIndex);
+                var kindProp = targetProp.FindPropertyRelative(nameof(AttributeTarget.kind));
+                var vertexColorProp = targetProp.FindPropertyRelative(nameof(AttributeTarget.vertexColorTarget));
+
+                var vertexColorComponentProp = vertexColorProp.FindPropertyRelative(nameof(VertexColorTarget.component));
+
+                kindProp.enumValueIndex = (int) AttributeTarget.Kind.VertexColor;
+                vertexColorComponentProp.enumValueIndex = targetIndex;
+            }
+        }
+
+        void SetUVs(SerializedProperty targetArray, int channel)
+        {
+            for (int targetIndex = 0; targetIndex < targetArray.arraySize; ++targetIndex)
+            {
+                var targetProp = targetArray.GetArrayElementAtIndex(targetIndex);
+                var kindProp = targetProp.FindPropertyRelative(nameof(AttributeTarget.kind));
+                var uvProp = targetProp.FindPropertyRelative(nameof(AttributeTarget.uvTarget));
+
+                var vertexColorChannelProp = uvProp.FindPropertyRelative(nameof(UVTarget.channel));
+                var vertexColorComponentProp = uvProp.FindPropertyRelative(nameof(UVTarget.component));
+
+                kindProp.enumValueIndex = (int) AttributeTarget.Kind.UV;
+                vertexColorChannelProp.enumValueIndex = channel;
+                vertexColorComponentProp.enumValueIndex = targetIndex;
+            }
+        }
+
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
@@ -15,21 +47,40 @@ namespace ChemicalCrux.AttributeImporter
 
             for (int attributeIndex = 0; attributeIndex < array.arraySize; ++attributeIndex)
             {
-                var attribute = array.GetArrayElementAtIndex(attributeIndex);
+                var attributeProp = array.GetArrayElementAtIndex(attributeIndex);
 
-                var attributeNameProp = attribute.FindPropertyRelative(nameof(DataImporter.AttributeConfig.name));
-                var existsProp = attribute.FindPropertyRelative(nameof(DataImporter.AttributeConfig.exists));
+                var attributeNameProp = attributeProp.FindPropertyRelative(nameof(DataImporter.AttributeConfig.name));
+                var existsProp = attributeProp.FindPropertyRelative(nameof(DataImporter.AttributeConfig.exists));
 
                 if (!existsProp.boolValue)
                     continue;
 
                 EditorGUILayout.BeginVertical();
 
-                var targetArray = attribute.FindPropertyRelative("targets");
+                var targetArray = attributeProp.FindPropertyRelative("targets");
 
                 Color oldColor = GUI.backgroundColor;
 
+                EditorGUILayout.BeginHorizontal();
+
                 GUILayout.Label(attributeNameProp.stringValue);
+
+                EditorGUILayout.BeginHorizontal(GUILayout.MaxWidth(150));
+
+                if (GUILayout.Button("Color"))
+                {
+                    SetColors(targetArray);
+                }
+                for (int i = 0; i < 4; ++i)
+                {
+                    if (GUILayout.Button($"UV{i}"))
+                    {
+                        SetUVs(targetArray, i);
+                    }
+                }
+                
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndHorizontal();
                 GUILayout.Space(8);
 
                 for (int targetIndex = 0; targetIndex < targetArray.arraySize; ++targetIndex)
@@ -43,9 +94,9 @@ namespace ChemicalCrux.AttributeImporter
                         _ => oldColor
                     };
 
-                    var target = targetArray.GetArrayElementAtIndex(targetIndex);
+                    var targetProp = targetArray.GetArrayElementAtIndex(targetIndex);
 
-                    var kindProp = target.FindPropertyRelative(nameof(AttributeTarget.kind));
+                    var kindProp = targetProp.FindPropertyRelative(nameof(AttributeTarget.kind));
 
                     EditorGUILayout.BeginHorizontal();
                     EditorGUILayout.BeginHorizontal();
@@ -71,12 +122,12 @@ namespace ChemicalCrux.AttributeImporter
 
                     if (kind == AttributeTarget.Kind.UV)
                     {
-                        var uvProp = target.FindPropertyRelative(nameof(AttributeTarget.uvTarget));
+                        var uvProp = targetProp.FindPropertyRelative(nameof(AttributeTarget.uvTarget));
                         EditorGUILayout.PropertyField(uvProp);
                     }
                     else if (kind == AttributeTarget.Kind.VertexColor)
                     {
-                        var vertexColorProp = target.FindPropertyRelative(nameof(AttributeTarget.vertexColorTarget));
+                        var vertexColorProp = targetProp.FindPropertyRelative(nameof(AttributeTarget.vertexColorTarget));
                         EditorGUILayout.PropertyField(vertexColorProp);
                     }
                     else
