@@ -10,9 +10,14 @@
     "license": "MIT",
     "samples": [
         {
+            "displayName": "Shared Assets",
+            "description": "Assets used by the other samples. Import this first!",
+            "path": "Samples~/Shared"
+        },
+        {
             "displayName": "Simple Example",
             "description": "An example of several attributes being imported for one object",
-            "path": "Samples~/SimpleExample"
+            "path": "Samples~/Simple Example"
         }
     ]
 }

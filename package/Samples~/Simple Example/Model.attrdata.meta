@@ -1,0 +1,106 @@
+fileFormatVersion: 2
+guid: 3bbdc1ef5e27e49d2923e92b4c36ca81
+ScriptedImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 2
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+  script: {fileID: 11500000, guid: cced918962eee446b9eb885219282c3e, type: 3}
+  objectNames:
+  - Sphere
+  activeAttributeInfo:
+  - name: Painted
+    dimensions: 4
+  - name: Pose Space
+    dimensions: 4
+  - name: Curve Direction
+    dimensions: 3
+  - name: Random Bool
+    dimensions: 1
+  attributeConfigs:
+  - name: Pose Space
+    exists: 1
+    targets:
+    - kind: 1
+      uvTarget:
+        channel: 1
+        component: 0
+      vertexColorTarget:
+        component: 0
+    - kind: 1
+      uvTarget:
+        channel: 1
+        component: 1
+      vertexColorTarget:
+        component: 0
+    - kind: 1
+      uvTarget:
+        channel: 1
+        component: 2
+      vertexColorTarget:
+        component: 0
+    - kind: 1
+      uvTarget:
+        channel: 1
+        component: 3
+      vertexColorTarget:
+        component: 0
+  - name: Curve Direction
+    exists: 1
+    targets:
+    - kind: 2
+      uvTarget:
+        channel: 0
+        component: 0
+      vertexColorTarget:
+        component: 0
+    - kind: 2
+      uvTarget:
+        channel: 2
+        component: 1
+      vertexColorTarget:
+        component: 1
+    - kind: 2
+      uvTarget:
+        channel: 2
+        component: 2
+      vertexColorTarget:
+        component: 2
+  - name: Painted
+    exists: 1
+    targets:
+    - kind: 1
+      uvTarget:
+        channel: 2
+        component: 0
+      vertexColorTarget:
+        component: 0
+    - kind: 1
+      uvTarget:
+        channel: 2
+        component: 1
+      vertexColorTarget:
+        component: 0
+    - kind: 1
+      uvTarget:
+        channel: 3
+        component: 0
+      vertexColorTarget:
+        component: 0
+    - kind: 1
+      uvTarget:
+        channel: 3
+        component: 1
+      vertexColorTarget:
+        component: 0
+  - name: Random Bool
+    exists: 1
+    targets:
+    - kind: 1
+      uvTarget:
+        channel: 1
+        component: 3
+      vertexColorTarget:
+        component: 0
