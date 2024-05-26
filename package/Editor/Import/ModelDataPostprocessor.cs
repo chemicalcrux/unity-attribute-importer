@@ -119,15 +119,7 @@ namespace ChemicalCrux.AttributeImporter
             for (int i = 0; i < verts; ++i)
             {
                 float xCoord = lookup[i][parser.VertexSource.ComponentIndex];
-                int index = 0;
-
-                // type-pun the float back into an int to retrieve the original vertex index.
-                unsafe
-                {
-                    float* ptr = &xCoord;
-                    index = *(int*)ptr;
-                }
-
+                int index = Mathf.RoundToInt(xCoord);
                 indexLookup.Add(index);
             }
 

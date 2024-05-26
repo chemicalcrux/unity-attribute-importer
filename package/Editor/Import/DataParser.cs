@@ -8,7 +8,7 @@ namespace ChemicalCrux.AttributeImporter
 {
     public class DataParser
     {
-        private const int expectedVersion = 1;
+        private const int expectedVersion = 2;
 
         private BinaryReader reader;
 
