@@ -11,12 +11,12 @@ ScriptedImporter:
   objectNames:
   - Sphere
   activeAttributeInfo:
+  - name: Curve Direction
+    dimensions: 3
   - name: Painted
     dimensions: 4
   - name: Pose Space
     dimensions: 4
-  - name: Curve Direction
-    dimensions: 3
   - name: Random Bool
     dimensions: 1
   attributeConfigs:
@@ -47,6 +47,7 @@ ScriptedImporter:
         component: 3
       vertexColorTarget:
         component: 0
+    transformers: []
   - name: Curve Direction
     exists: 1
     targets:
@@ -68,6 +69,7 @@ ScriptedImporter:
         component: 2
       vertexColorTarget:
         component: 2
+    transformers: []
   - name: Painted
     exists: 1
     targets:
@@ -95,6 +97,7 @@ ScriptedImporter:
         component: 1
       vertexColorTarget:
         component: 0
+    transformers: []
   - name: Random Bool
     exists: 1
     targets:
@@ -104,3 +107,7 @@ ScriptedImporter:
         component: 3
       vertexColorTarget:
         component: 0
+    transformers: []
+  references:
+    version: 2
+    RefIds: []

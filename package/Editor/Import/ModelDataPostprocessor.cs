@@ -128,19 +128,19 @@ namespace ChemicalCrux.AttributeImporter
             IntermediateVertexData intermediateVertexData = new(vertexMetadata.attributeConfigs, usedAttributes, parser.VertexCount, mesh);
 
             for (int recordIndex = 0; recordIndex < parser.NumRecords; ++recordIndex)
-                ReadSingleRecord(vertexMetadata.attributeConfigs, intermediateVertexData, parser, mesh, indexLookup);
-
+                ReadSingleRecord(vertexMetadata, intermediateVertexData, parser, mesh, indexLookup);
+            
             intermediateVertexData.Flush();
         }
 
-        void ReadSingleRecord(List<DataImporter.AttributeConfig> configs, IntermediateVertexData intermediateVertexData, DataParser parser, Mesh mesh, List<int> indexLookup)
+        void ReadSingleRecord(AttributeMetadata attributeMetadata, IntermediateVertexData intermediateVertexData, DataParser parser, Mesh mesh, List<int> indexLookup)
         {
             parser.ReadRecordHeader();
 
             if (Settings.instance.LogDebug)
                 Debug.Log($"Reading {parser.AttributeName} into {mesh.name}");
 
-            var config = configs.Find(config => config.name == parser.AttributeName);
+            var config = attributeMetadata.attributeConfigs.Find(config => config.name == parser.AttributeName);
             var targets = config.targets;
 
             if (Settings.instance.LogDebug)
@@ -153,24 +153,35 @@ namespace ChemicalCrux.AttributeImporter
             if (Settings.instance.LogDebug)
                 Debug.Log($"Reading {parser.VertexCount} verts with {parser.Dimensions} dimensions");
 
-            List<Vector4> results = new(parser.VertexCount);
-
-            parser.ReadRecordData(results);
-
             int meshVertices = mesh.vertexCount;
+
+            List<Vector4> results = new(parser.VertexCount);
+            List<Vector4> mappedResults = new(meshVertices);
+            
+            parser.ReadRecordData(results);
 
             for (int vertex = 0; vertex < meshVertices; ++vertex)
             {
                 int index = indexLookup[vertex];
-
+                
                 if (index < 0 || index >= results.Count)
                 {
                     if (Settings.instance.LogError)
                         Debug.LogError($"Bogus index of {index} for {mesh.name}; only {results.Count}/{parser.VertexCount} vertices should be there Did the UV map get overwritten?");
                     return;
                 }
+                
+                mappedResults.Add(results[index]);
+            }
 
-                Vector4 vec = results[index];
+            foreach (var transformer in config.transformers)
+            {
+                transformer.Transform(mesh, mappedResults);
+            }
+
+            for (int vertex = 0; vertex < meshVertices; ++vertex)
+            {
+                Vector4 vec = mappedResults[vertex];
 
                 for (int targetIndex = 0; targetIndex < targets.Count; ++targetIndex)
                     intermediateVertexData.Write(targets[targetIndex], vertex, vec[targetIndex]);

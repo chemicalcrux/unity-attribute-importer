@@ -3,6 +3,8 @@ using System.IO;
 using UnityEditor.AssetImporters;
 using UnityEngine;
 using System.Linq;
+using ChemicalCrux.AttributeImporter.Transformers;
+using UnityEditor;
 
 namespace ChemicalCrux.AttributeImporter
 {
@@ -22,6 +24,9 @@ namespace ChemicalCrux.AttributeImporter
             [HideInInspector, SerializeField] internal bool exists;
 
             public List<AttributeTarget> targets;
+
+            [SerializeReference, SerializeReferenceDropdown]
+            public List<VertexTransformer> transformers;
         }
 
         /// <summary>
@@ -42,7 +47,7 @@ namespace ChemicalCrux.AttributeImporter
         public override void OnImportAsset(AssetImportContext ctx)
         {
             objectNames.Clear();
-
+            
             HashSet<AttributeInfo> attributeInfoSet = new();
 
             using var stream = File.Open(ctx.assetPath, FileMode.Open);
@@ -74,7 +79,7 @@ namespace ChemicalCrux.AttributeImporter
             activeAttributeInfo.Clear();
             activeAttributeInfo.AddRange(attributeInfoSet);
 
-            UpdateConfigs();
+            UpdateConfigs(ctx);
 
             AttributeMetadata metadata = ScriptableObject.CreateInstance<AttributeMetadata>();
             metadata.Setup(this);
@@ -83,7 +88,7 @@ namespace ChemicalCrux.AttributeImporter
             ctx.SetMainObject(metadata);
         }
 
-        void UpdateConfigs()
+        void UpdateConfigs(AssetImportContext ctx)
         {
             foreach (var info in activeAttributeInfo)
             {

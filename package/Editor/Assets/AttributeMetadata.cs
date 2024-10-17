@@ -1,16 +1,12 @@
 using System.Collections.Generic;
+using ChemicalCrux.AttributeImporter.Transformers;
+using NUnit.Framework.Constraints;
 using UnityEngine;
 
 namespace ChemicalCrux.AttributeImporter
 {
     public class AttributeMetadata : ScriptableObject
     {
-        public class Data
-        {
-            public string attribute;
-            public AttributeTarget target;
-        }
-
         public List<DataImporter.AttributeConfig> attributeConfigs;
 
         public void Setup(DataImporter importer)

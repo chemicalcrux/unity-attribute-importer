@@ -143,6 +143,9 @@ namespace ChemicalCrux.AttributeImporter
 
                 GUILayout.Space(16);
 
+                var transformerProp = attributeProp.FindPropertyRelative(nameof(DataImporter.AttributeConfig.transformers));
+                EditorGUILayout.PropertyField(transformerProp);
+                
                 EditorGUILayout.EndVertical();
             }
 

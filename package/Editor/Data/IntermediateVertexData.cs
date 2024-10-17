@@ -89,7 +89,7 @@ namespace ChemicalCrux.AttributeImporter
                 }
             }
         }
-
+        
         public void Write(AttributeTarget target, int index, float value)
         {
             switch (target.kind)

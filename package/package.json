@@ -1,6 +1,6 @@
 {
     "name": "com.chemicalcrux.attribute-importer",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Imports attributes from Blender and stores them into the vertex data of meshes.",
     "displayName": "Attribute Importer",
     "author": {
@@ -19,5 +19,8 @@
             "description": "An example of several attributes being imported for one object",
             "path": "Samples~/Simple Example"
         }
-    ]
+    ],
+    "dependencies": {
+        "com.alexeytaranov.serializereferencedropdown": "0.4.0"
+    }
 }
